@@ -1,0 +1,137 @@
+---
+title: Upload files with Expo and Hono
+date: 2024-04-22
+---
+
+uploadAsync is a function to upload files typesafe in Expo using FileSystem.uploadAsync. It infers the fieldName and response from the Hono RPC client.
+
+:::code-group
+
+```ts [client] filename="client.tsx"
+// @noErrors
+import { hc } from "hono/client";
+//---cut---
+import type { AppType } from "./server";
+import { uploadAsync } from "./upload-async";
+
+const api = hc<AppType>("YOUR_SERVER_URL");
+
+async function submitFile(file: File) {
+  const json = await uploadAsync(api.upload, "", {
+    fieldName: "",
+    //          ^|
+  });
+
+  //typesafe
+  json.su;
+  //     ^|
+}
+```
+
+```ts [server] filename="server.ts"
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
+
+const app = new Hono();
+
+const routes = app.post(
+  "/upload",
+  zValidator(
+    "form",
+    z
+      .object({
+        file: z.instanceof(Blob),
+        image: z.instanceof(Blob),
+      })
+      .partial()
+  ),
+  (c) => {
+    const { file, image } = c.req.valid("form");
+
+    //Upload the file...
+
+    return c.json({ success: true });
+  }
+);
+
+export type AppType = typeof routes;
+```
+
+```ts [upload-async] filename="upload-async.ts"
+import type { Schema } from "hono";
+import type { ClientRequest } from "hono/client";
+//---cut---
+import * as FileSystem from "expo-file-system";
+import type {
+  FieldName,
+  ResolveMethod,
+  RequestOutput,
+} from "./types";
+
+export async function uploadAsync<
+  TSchema extends Schema,
+  TMethod extends keyof TSchema
+>(
+  request: ClientRequest<TSchema>,
+  imageUri: string,
+  opts: {
+    httpMethod?: TMethod;
+    fieldName: FieldName<TSchema, ResolveMethod<TSchema, TMethod>>;
+  }
+): Promise<RequestOutput<TSchema, TMethod>> {
+  const methodMap = {
+    $post: "POST",
+    $put: "PUT",
+    $patch: "PATCH",
+  } as const;
+
+  const response = await FileSystem.uploadAsync(
+    request.$url().toString(),
+    imageUri,
+    {
+      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+      ...opts,
+      httpMethod:
+        methodMap[
+          (opts.httpMethod as keyof typeof methodMap) ?? "$post"
+        ],
+    }
+  );
+
+  return JSON.parse(response.body);
+}
+```
+
+```ts [types] filename="types.ts"
+import type { Schema } from "hono";
+//---cut---
+export type FieldName<
+  TSchema extends Schema,
+  TMethod extends keyof TSchema
+> = {
+  [K in keyof TSchema]: TSchema[K] extends {
+    input: {
+      form: infer TInput;
+    };
+  }
+    ? keyof TInput
+    : never;
+}[TMethod];
+
+export type ResolveMethod<
+  TSchema extends Schema,
+  TMethod
+> = keyof TSchema extends TMethod ? "$post" : TMethod;
+
+export type RequestOutput<
+  TSchema extends Schema,
+  TMethod extends keyof TSchema
+> = TSchema[TMethod] extends {
+  output: infer TOutput;
+}
+  ? TOutput
+  : never;
+```
+
+:::

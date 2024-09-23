@@ -1,0 +1,227 @@
+---
+title: OpenAi structured output server sent events
+date: 2024-04-22
+---
+
+:::code-group
+
+```tsx [client] filename="client.tsx"
+// @noErrors
+import * as React from "react";
+//---cut---
+import { receiptSchema } from "./schema";
+import { useObject } from "./use-object";
+
+export const Receipt = () => {
+  const { submit, data, isLoading, error } = useObject({
+    api: "/api/receipt",
+    schema: receiptSchema,
+    onSuccess: ({ data, error }) => {
+      data.
+      //   ^|
+    },
+  });
+
+  //...
+};
+```
+
+```ts [server] filename="server.ts"
+import { Hono } from "hono";
+import { OpenAI } from "openai";
+import { streamSSE } from "hono/streaming";
+import { zodResponseFormat } from "openai/helpers/zod";
+
+const openai = new OpenAI();
+const app = new Hono();
+//---cut---
+import { receiptSchema } from "./schema";
+
+app.post("/receipts/generate", async (c) => {
+  const { store } = await c.req.json();
+  const chatStream = await openai.chat.completions.create({
+    model: "gpt-4o-2024-08-06",
+    messages: [
+      {
+        role: "user",
+        content: `Generate a receipt for my favorite store: ${store}`,
+      },
+    ],
+    response_format: zodResponseFormat(
+      receiptSchema,
+      "receipt_response"
+    ),
+    stream: true,
+  });
+
+  return streamSSE(c, async (stream) => {
+    for await (const message of chatStream) {
+      await stream.writeSSE({
+        id: message.id,
+        data: JSON.stringify({
+          content: message.choices[0]?.delta.content,
+        }),
+        event: "message",
+      });
+    }
+    await stream.writeSSE({ data: "[DONE]", event: "message" });
+  });
+});
+```
+
+```ts [use-object] filename="use-object.ts"
+import * as React from "react";
+import EventSource, { type MessageEvent } from "react-native-sse";
+import { z, ZodError, type Schema } from "zod";
+import { parse } from "best-effort-json-parser";
+import {
+  hashKey,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+function parseEvent(event: MessageEvent) {
+  const data = JSON.parse(event.data ?? "{}");
+
+  return z
+    .object({
+      content: z.string().optional(),
+    })
+    .parse(data);
+}
+
+export type DeepPartial<T> = T extends (infer U)[]
+  ? DeepPartial<U>[]
+  : {
+      [P in keyof T]?: T[P];
+    } & {};
+//---cut---
+const sources = new Map<string, EventSource>();
+
+export function useObject<TOutput extends Schema>(opts: {
+  api: string;
+  id?: string;
+  schema: TOutput;
+  onSuccess?: (event: {
+    data: TOutput["_output"] | undefined;
+    error: ZodError<TOutput> | undefined;
+  }) => void;
+}) {
+  //Use this id to sync
+  const id = opts.id ?? React.useId();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | undefined>(
+    undefined
+  );
+  const queryClient = useQueryClient();
+
+  const queryKey = [opts.api, id];
+  const { data } = useQuery({
+    queryKey,
+    staleTime: Infinity,
+    initialData: {},
+  });
+
+  const hashedKey = hashKey(queryKey);
+
+  React.useEffect(() => {
+    const es = sources.get(hashedKey);
+
+    if (es) {
+      subscribe(es);
+    }
+
+    return () => {
+      sources.get(hashedKey)?.close();
+    };
+  }, []);
+
+  function subscribe(es: EventSource) {
+    setIsLoading(true);
+
+    let accText = "";
+    let lastObject: any = null;
+
+    es.addEventListener("message", (event) => {
+      if (event.data === "[DONE]") {
+        if (opts.onSuccess) {
+          const result = opts.schema.safeParse(lastObject);
+
+          opts.onSuccess(
+            result.success
+              ? {
+                  data: result.data,
+                  error: undefined,
+                }
+              : {
+                  data: undefined,
+                  error: result.error,
+                }
+          );
+        }
+
+        setIsLoading(false);
+        es.close();
+
+        return;
+      }
+
+      const { content } = parseEvent(event);
+
+      accText += content ?? "";
+      lastObject = parse(accText);
+
+      queryClient.setQueryData(queryKey, lastObject);
+    });
+
+    es.addEventListener("error", (event) => {
+      if ("error" in event) {
+        setError(event.error);
+      }
+
+      setIsLoading(false);
+      es.close();
+    });
+  }
+
+  function submit(input: Record<string, unknown>) {
+    const es = new EventSource(opts.api, {
+      method: "POST",
+      body: JSON.stringify(input),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    sources.set(hashedKey, es);
+    queryClient.setQueryData(queryKey, {});
+
+    subscribe(es);
+  }
+
+  return {
+    submit,
+    data: data as TOutput["_output"],
+    error,
+    isLoading,
+  };
+}
+```
+
+```ts [schema] filename="schema.ts"
+import { z } from "zod";
+//---cut---
+export const receiptSchema = z.object({
+  name: z.string(),
+  category: z.string(),
+  items: z.array(
+    z.object({
+      amount: z.number(),
+      name: z.string(),
+      price: z.number(),
+    })
+  ),
+});
+```
+
+:::

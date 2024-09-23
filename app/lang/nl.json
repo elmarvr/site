@@ -1,0 +1,13 @@
+{
+  "nav.projects": "Projecten",
+  "nav.snippets": "Snippets",
+  "nav.language": "Taal",
+
+  "general.next": "Volgende",
+  "general.previous": "Vorige",
+
+  "plural.one": "ste",
+  "plural.two": "de",
+  "plural.few": "de",
+  "plural.other": "de"
+}

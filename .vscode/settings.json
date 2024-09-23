@@ -1,0 +1,12 @@
+{
+  "i18n-ally.localesPaths": ["app/lang"],
+  "i18n-ally.sourceLanguage": "en",
+  "i18n-ally.keystyle": "flat",
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "cva",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-select",
+    "@radix-ui/react-tabs",
+    "@radix-ui/react-tooltip"
+  ]
+}

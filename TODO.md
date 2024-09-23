@@ -1,0 +1,6 @@
+- Add snippets
+- Animations transition
+- Add Projects
+- Focus ring
+- Logo
+- replace hover hover with screen width

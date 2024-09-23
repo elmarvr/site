@@ -1,0 +1,26 @@
+{
+  "typescript": {
+    "name": "TypeScript"
+  },
+  "react": {
+    "name": "React"
+  },
+  "tailwind": {
+    "name": "Tailwind CSS"
+  },
+  "tanstack-query": {
+    "name": "TanStack Query"
+  },
+  "nextjs": {
+    "name": "Next.js"
+  },
+  "vite": {
+    "name": "Vite"
+  },
+  "vue3": {
+    "name": "Vue 3"
+  },
+  "xstate": {
+    "name": "XState"
+  }
+}

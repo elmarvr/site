@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background: theme(colors.zinc.900);
+    --color-foreground: theme(colors.zinc.100);
+    --color-primary: theme(colors.green.500);
+    --color-primary-foreground: theme(colors.zinc.100);
+    --color-popover: theme(colors.zinc.900);
+    --color-popover-foreground: theme(colors.zinc.100);
+    /* Darken this a bit later */
+    --color-accent: theme(colors.zinc.800);
+    --color-accent-foreground: theme(colors.zinc.100);
+    --color-muted: theme(colors.zinc.700);
+    --color-muted-foreground: theme(colors.zinc.500);
+    --color-card: theme(colors.zinc.800);
+    --color-card-foreground: theme(colors.zinc.100);
+
+    --color-border: theme(colors.zinc.700);
+    --color-ring: theme(colors.blue.500);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground overflow-x-hidden font-body;
+  }
+}
+
+.twoslash-error-line {
+  @apply bg-red-500/10 text-red-500 my-1 py-1.5 px-3 relative w-fit sm:w-auto sm:-mx-4;
+}
+
+.twoslash-error-line::after {
+  @apply absolute top-0 left-0 bottom-0 w-[3px] bg-red-500 content-[''];
+}
+
+.twoslash-completion-cursor {
+  @apply relative;
+}
+.twoslash-completion-cursor::before {
+  @apply absolute bottom-[0.1em] h-[1em] -left-px w-0.5 bg-muted-foreground content-[''];
+}
+
+.twoslash-completion-list {
+  @apply bg-background border rounded-lg py-1 px-2 absolute left-0 min-w-40 animate-in zoom-in-95 fade-in slide-in-from-top-4;
+}
+
+.twoslash-completions-unmatched {
+  @apply text-muted-foreground;
+}
+
+.twoslash-completion-list svg {
+  display: none;
+}

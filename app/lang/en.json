@@ -1,0 +1,13 @@
+{
+  "nav.projects": "Projects",
+  "nav.snippets": "Snippets",
+  "nav.language": "Language",
+
+  "general.next": "Next",
+  "general.previous": "Previous",
+
+  "plural.one": "st",
+  "plural.two": "nd",
+  "plural.few": "rd",
+  "plural.other": "th"
+}
