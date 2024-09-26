@@ -4,6 +4,7 @@ import { i18n } from "i18n.config";
 
 import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
+import { Prose } from "~/components/ui/prose";
 import { getCollection } from "~/lib/collection";
 import { MDXContent } from "~/mdx/client";
 
@@ -24,14 +25,20 @@ export default function Projects() {
   const { projects } = useLoaderData<typeof loader>();
 
   return (
-    <ul>
-      {projects.map((project) => {
+    <ul className="space-y-7 pt-8">
+      {projects.map((project, index) => {
         return (
-          <li key={project.slug}>
+          <li
+            key={project.slug}
+            className="space-y-3 animate-in fade-in fill-mode-both slide-in-from-bottom-10"
+            style={{
+              animationDelay: `${100 * index}ms`,
+            }}
+          >
             <div className="flex justify-between items-center">
-              <h2 className="font-normal">{project.title}</h2>
+              <h2 className="font-semibold">{project.title}</h2>
 
-              <ul className="flex">
+              <ul className="flex gap-2">
                 {project.skills.map((skill) => {
                   return (
                     <li
@@ -45,27 +52,14 @@ export default function Projects() {
               </ul>
             </div>
 
-            <div className="text-zinc-200">
+            <Prose>
               <MDXContent code={project.content} />
-            </div>
+            </Prose>
 
-            <div className="flex">
-              {project.url && (
-                <Link
-                  className="block hover:text-primary transition-colors"
-                  to={project.url}
-                >
-                  Live <Icon.ArrowRight className="inline -rotate-45 size-4" />
-                </Link>
-              )}
+            <div className="flex gap-3">
+              {project.url && <ProjectLink to={project.url}>Live</ProjectLink>}
               {project.github && (
-                <Link
-                  className="block hover:text-primary transition-colors"
-                  to={project.github}
-                >
-                  Source{" "}
-                  <Icon.ArrowRight className="inline -rotate-45 size-4" />
-                </Link>
+                <ProjectLink to={project.github}>Source</ProjectLink>
               )}
             </div>
           </li>
@@ -74,3 +68,18 @@ export default function Projects() {
     </ul>
   );
 }
+
+const ProjectLink = ({
+  to,
+  children,
+}: {
+  to: string;
+  children: React.ReactNode;
+}) => {
+  return (
+    <Link className="flex items-center gap-1 group hover:underline" to={to}>
+      {children}
+      <Icon.ArrowRight className="-rotate-45 size-3.5 text-primary mt-0.5" />
+    </Link>
+  );
+};

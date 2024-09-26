@@ -31,6 +31,13 @@ export default {
       fontFamily: {
         body: ["Inconsolata", "monospace"],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "auto",
+          },
+        },
+      },
     },
   },
   plugins: [

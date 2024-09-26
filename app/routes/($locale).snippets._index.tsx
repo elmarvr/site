@@ -1,10 +1,13 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { i18n } from "i18n.config";
 import { FormattedDate, FormattedPlural, useIntl } from "react-intl";
+import { i18n } from "i18n.config";
+
+import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { useViewTransitionState } from "~/hooks/use-view-transition";
 import { CollectionEntry, getCollection } from "~/lib/collection";
+import { ViewTransitionLink } from "~/components/view-transition-link";
 
 export const loader = ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;
@@ -49,32 +52,32 @@ export default function Snippets() {
   const { snippets } = useLoaderData<typeof loader>();
 
   return (
-    <div>
-      <ul>
+    <div className="pt-8">
+      <ul className="space-y-4">
         {snippets.map(({ date, items, showYear }) => {
           return (
             <div key={date}>
-              <li className="font-semibold flex justify-between">
-                <p>
+              <li className="flex justify-between font-semibold">
+                <time>
                   <FormattedDate value={date} month="long" />
-                </p>
+                </time>
 
                 {showYear && (
-                  <p>
+                  <time>
                     <FormattedDate value={date} year="numeric" />
-                  </p>
+                  </time>
                 )}
               </li>
+
               <ul className="divide-y divide-border divide-dashed">
                 {items.map((snippet) => (
-                  <li key={snippet.slug}>
-                    <SnippetLink
-                      snippet={{
-                        ...snippet,
-                        date: new Date(snippet.date),
-                      }}
-                    />
-                  </li>
+                  <SnippetItem
+                    key={snippet.slug}
+                    snippet={{
+                      ...snippet,
+                      date: new Date(snippet.date),
+                    }}
+                  />
                 ))}
               </ul>
             </div>
@@ -85,32 +88,25 @@ export default function Snippets() {
   );
 }
 
-export const SnippetLink = ({
+export const SnippetItem = ({
   snippet,
 }: {
   snippet: CollectionEntry<"snippets">;
 }) => {
-  const to = `/snippets/${snippet.slug}`;
-  const isTransitioning = useViewTransitionState(to);
-
   return (
-    <Link
-      className="flex items-center py-3 text-zinc-200"
-      to={to}
-      unstable_viewTransition
-    >
-      <h2
-        style={{
-          viewTransitionName: isTransitioning ? "snippet-title" : undefined,
-        }}
+    <li className="flex justify-between py-3 items-center text-zinc-300">
+      <ViewTransitionLink
+        to={`/snippets/${snippet.slug}`}
+        name="snippet-title"
+        className="hover:underline underline-offset-2"
       >
         {snippet.title}
-      </h2>
+      </ViewTransitionLink>
 
-      <p className="ml-auto">
-        <FormattedOrdinal value={snippet.date.getDate()} />
-      </p>
-    </Link>
+      <time>
+        <FormattedOrdinal value={new Date(snippet.date).getDate()} />
+      </time>
+    </li>
   );
 };
 

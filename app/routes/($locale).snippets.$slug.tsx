@@ -1,13 +1,15 @@
-import { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { FormattedDate, FormattedMessage } from "react-intl";
 import { i18n } from "i18n.config";
-
+import { FormattedMessage } from "react-intl";
+import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
-import { CollectionEntry, getCollection, getEntry } from "~/lib/collection";
-import { MDXContent } from "~/mdx/client";
+import { Prose } from "~/components/ui/prose";
 import { useViewTransitionState } from "~/hooks/use-view-transition";
-import { cx } from "~/lib/styles";
+
+import { getCollection, getEntry } from "~/lib/collection";
+import { attr } from "~/lib/utils";
+import { MDXContent } from "~/mdx/client";
 
 export const loader = ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;
@@ -21,91 +23,115 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
     });
   }
 
-  const snippets = getCollection(
-    "snippets",
-    (entry) => entry._meta.directory === locale
-  );
-
-  snippets.sort((a, b) => {
-    return a.date > b.date ? -1 : 1;
-  });
-
-  const index = snippets.findIndex((s) => s.slug === snippet.slug);
-  const previous = snippets[index - 1];
-  const next = snippets[index + 1];
-
   return {
     snippet,
-    previous,
-    next,
   };
 };
 
 export default function SnippetName() {
-  const { snippet, previous, next } = useLoaderData<typeof loader>();
+  const { snippet } = useLoaderData<typeof loader>();
   const isTransitioning = useViewTransitionState("/snippets");
 
   return (
-    <div>
-      <div
-        className="pb-4"
+    <div className="pt-8">
+      <h2
+        className="inline-flex text-lg pb-3"
         style={{
           viewTransitionName: "snippet-title",
         }}
       >
-        <h1 className="text-lg">{snippet.title}</h1>
-        <p className="text-muted-foreground">
-          <FormattedDate
-            value={snippet.date}
-            day="numeric"
-            month="short"
-            year="numeric"
-          />
-        </p>
-      </div>
+        {snippet.title}
+      </h2>
 
-      <div
-        data-entering={isTransitioning ? "" : undefined}
-        className="prose-zinc prose-invert [&>p+.code-group]:mt-7 data-[entering]:animate-in data-[entering]:slide-in-from-bottom-4 data-[entering]:fade-in"
+      <Prose
+        data-entering={attr(isTransitioning)}
+        className="animate-in data-[entering]:fade-in data-[entering]:slide-in-from-bottom-1/2"
       >
         <MDXContent code={snippet.content} />
-      </div>
+      </Prose>
 
-      <div className="flex justify-between mt-8 border-t gap-4 py-4">
-        {previous && <SnippetLink snippet={previous} type="previous" />}
-        {next && <SnippetLink snippet={next} type="next" />}
+      <div className="py-5 flex justify-between">
+        {snippet.previous && (
+          <Link
+            className="flex flex-col group"
+            to={`/snippets/${snippet.previous.slug}`}
+          >
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Icon.CaretLeft className="size-[1em]" />
+              <FormattedMessage id="general.previous" />
+            </div>
+            <span className="group-hover:underline">
+              {snippet.previous.title}
+            </span>
+          </Link>
+        )}
+
+        {snippet.next && (
+          <Link
+            className="flex flex-col items-end group ml-auto"
+            to={`/snippets/${snippet.next.slug}`}
+          >
+            <div className="flex items-center text-sm text-muted-foreground">
+              <FormattedMessage id="general.next" />
+              <Icon.CaretRight className="size-[1em]" />
+            </div>
+            <span className="group-hover:underline">{snippet.next.title}</span>
+          </Link>
+        )}
       </div>
     </div>
   );
 }
 
-const SnippetLink = ({
-  snippet,
-  type,
-}: {
-  snippet: SerializeFrom<CollectionEntry<"snippets">>;
-  type: "previous" | "next";
-}) => {
-  return (
-    <Link
-      unstable_viewTransition
-      className={cx(
-        "flex flex-col group",
-        type === "next" ? "ml-auto" : "mr-auto"
-      )}
-      to={`/snippets/${snippet.slug}`}
-    >
-      <p
-        className={cx(
-          "text-muted-foreground text-sm",
-          type === "next" ? "text-right" : ""
-        )}
-      >
-        <FormattedMessage id={`general.${type}`} />
-      </p>
-      <p className="underline decoration-background group-hover:decoration-foreground transition-colors underline-offset-4 decoration-1">
-        {snippet.title}
-      </p>
-    </Link>
-  );
-};
+// <h1 className="text-lg">{snippet.title}</h1>
+// <p className="text-muted-foreground">
+//   <FormattedDate
+//     value={snippet.date}
+//     day="numeric"
+//     month="short"
+//     year="numeric"
+//   />
+// </p>
+
+// <div
+// data-entering={isTransitioning ? "" : undefined}
+// className="prose-zinc prose-invert [&>p+.code-group]:mt-7 data-[entering]:animate-in data-[entering]:slide-in-from-bottom-4 data-[entering]:fade-in"
+// >
+// <MDXContent code={snippet.content} />
+// </div>
+
+// <div className="flex justify-between mt-8 border-t gap-4 py-4">
+// {previous && <SnippetLink snippet={previous} type="previous" />}
+// {next && <SnippetLink snippet={next} type="next" />}
+// </div>
+
+// const SnippetLink = ({
+//   snippet,
+//   type,
+// }: {
+//   snippet: SerializeFrom<CollectionEntry<"snippets">>;
+//   type: "previous" | "next";
+// }) => {
+//   return (
+//     <Link
+//       unstable_viewTransition
+//       className={cx(
+//         "flex flex-col group",
+//         type === "next" ? "ml-auto" : "mr-auto"
+//       )}
+//       to={`/snippets/${snippet.slug}`}
+//     >
+//       <p
+//         className={cx(
+//           "text-muted-foreground text-sm",
+//           type === "next" ? "text-right" : ""
+//         )}
+//       >
+//         <FormattedMessage id={`general.${type}`} />
+//       </p>
+//       <p className="underline decoration-background group-hover:decoration-foreground transition-colors underline-offset-4 decoration-1">
+//         {snippet.title}
+//       </p>
+//     </Link>
+//   );
+// };

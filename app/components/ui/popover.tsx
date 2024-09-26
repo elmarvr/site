@@ -16,12 +16,13 @@ const popoverVariants = cva({
 
 interface PopoverContentProps extends RadixPopover.PopoverContentProps {}
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, sideOffset = 4, ...props }, ref) => {
     return (
       <RadixPopover.Portal>
         <RadixPopover.Content
           ref={ref}
           {...props}
+          sideOffset={sideOffset}
           className={cx(focusRing(), popoverVariants(), className)}
         >
           {children}

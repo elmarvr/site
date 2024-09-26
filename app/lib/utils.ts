@@ -1,10 +1,24 @@
-export function runIfFn<TArgs extends any[], TResult>(
-  maybeFn: TResult | ((...args: TArgs) => TResult),
-  ...args: TArgs
-) {
-  return isFunction(maybeFn) ? maybeFn(...args) : maybeFn;
+export function attr(value: boolean) {
+  return value ? "" : undefined;
 }
 
-export function isFunction(value: unknown): value is (...args: any[]) => any {
-  return typeof value === "function";
+export function orderBy<TItem, TKey>(
+  array: TItem[],
+  accessor: (item: TItem) => TKey,
+  order: "asc" | "desc" = "asc"
+) {
+  return [...array].sort((a, b) => {
+    const valueA = accessor(a);
+    const valueB = accessor(b);
+
+    if (valueA > valueB) {
+      return order === "asc" ? 1 : -1;
+    }
+
+    if (valueA < valueB) {
+      return order === "asc" ? -1 : 1;
+    }
+
+    return 0;
+  });
 }

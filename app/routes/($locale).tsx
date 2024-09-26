@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, redirect } from "@remix-run/react";
-import { FormattedMessage } from "react-intl";
+import { Outlet, redirect, useLocation } from "@remix-run/react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { i18n } from "i18n.config";
 
 import { LocaleSelect } from "~/components/locale-select";
@@ -37,13 +37,25 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export default function LocaleLayout() {
+  const intl = useIntl();
+  const location = useLocation();
+
   return (
-    <div className="min-h-screen px-2 mx-auto max-w-2xl">
-      <header className="sticky top-0 z-10">
-        <nav className="flex justify-between items-center w-full bg-card rounded">
-          <Link className="flex items-center gap-2" to="/">
-            Elmar
-          </Link>
+    <div className="px-2 mx-auto max-w-2xl">
+      <header className="sticky top-0 z-10 bg-background">
+        <nav className="flex justify-between items-center w-full mt-4 rounded">
+          {location.pathname !== $i18n("/", intl.locale) ? (
+            <Link
+              className="flex items-center gap-2"
+              to="/"
+              unstable_viewTransition
+              style={{ viewTransitionName: "logo" }}
+            >
+              Elmar
+            </Link>
+          ) : (
+            <span></span>
+          )}
 
           <div className="flex items-center gap-1">
             <Tooltip>

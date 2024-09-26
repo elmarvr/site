@@ -48,7 +48,7 @@
 }
 
 .twoslash-completion-list {
-  @apply bg-background border rounded-lg py-1 px-2 absolute left-0 min-w-40 animate-in zoom-in-95 fade-in slide-in-from-top-4;
+  @apply bg-background border rounded py-1 px-2 absolute left-0 min-w-40 animate-in zoom-in-95 fade-in slide-in-from-top-4;
 }
 
 .twoslash-completions-unmatched {

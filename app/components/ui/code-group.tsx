@@ -13,39 +13,17 @@ const CodeGroupRoot = React.forwardRef<
   HTMLDivElement,
   Omit<CodeGroupProps, "value" | "onValueChange" | "defaultValue">
 >(({ id, items, children, ...props }, ref) => {
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
-  const isTransitioning = useViewTransitionState();
-
-  const value = params.get("code") ?? items[0];
-
   return (
     <Tabs
       ref={ref}
+      defaultValue={items[0]}
       {...props}
-      value={value}
-      onValueChange={(value) => {
-        navigate(
-          { search: `?code=${value}` },
-          { unstable_viewTransition: true }
-        );
-      }}
-      className="code-group border rounded-md bg-card"
+      className="code-group border rounded bg-card"
     >
       <Tabs.List>
         {items.map((item, index) => (
           <Tabs.Trigger value={item} key={index}>
             {item}
-            {value === item && (
-              <div
-                className="absolute -bottom-px z-10 left-0 w-full h-0.5 bg-primary rounded-full"
-                style={{
-                  viewTransitionName: isTransitioning
-                    ? `tabs-trigger-${id}`
-                    : undefined,
-                }}
-              />
-            )}
           </Tabs.Trigger>
         ))}
       </Tabs.List>

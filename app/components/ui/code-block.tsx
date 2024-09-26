@@ -9,13 +9,13 @@ export const CodeBlock = React.forwardRef<
   React.ComponentPropsWithoutRef<"pre">
 >(({ style, className, ...props }, ref) => {
   return (
-    <div className="p-4 not-prose group bg-card text-sm relative text-foreground md border">
+    <div className="p-4 group bg-card relative text-foreground rounded border">
       <CopyButton />
       <pre
         ref={ref}
         {...props}
         className={cx(
-          "outline-none ring-offset-2 ring-offset-card focus-visible:ring-2 ring-ring overflow-x-auto sm:overflow-x-visible",
+          "outline-none not-prose text-sm ring-offset-2 ring-offset-card focus-visible:ring-2 ring-ring overflow-x-auto sm:overflow-x-visible",
           className
         )}
       />
