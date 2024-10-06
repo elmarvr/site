@@ -42,8 +42,8 @@ export default function LocaleLayout() {
 
   return (
     <div className="px-2 mx-auto max-w-2xl">
-      <header className="sticky top-0 z-10 bg-background">
-        <nav className="flex justify-between items-center w-full mt-4 rounded">
+      <header className="sticky top-0 z-20 bg-background">
+        <nav className="flex justify-between items-center w-full py-3 rounded">
           {location.pathname !== $i18n("/", intl.locale) ? (
             <Link
               className="flex items-center gap-2"

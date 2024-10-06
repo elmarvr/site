@@ -20,7 +20,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
           {...props}
           sideOffset={sideOffset}
           className={cx(
-            "bg-border text-sm py-1 px-2 rounded text-foreground z-10",
+            "bg-border text-sm py-1 px-2 rounded text-foreground z-20",
             className
           )}
         >

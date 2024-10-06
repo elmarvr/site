@@ -1,12 +1,15 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { i18n } from "i18n.config";
+import React from "react";
+import { useIntl } from "react-intl";
+import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { ViewTransitionLink } from "~/components/view-transition-link";
-import { useViewTransitionState } from "~/hooks/use-view-transition";
-import { getCollection } from "~/lib/collection";
+import { getCollection, getEntry } from "~/lib/collection";
 import { orderBy } from "~/lib/utils";
+import { MDXContent } from "~/mdx/client";
 
 export const meta: MetaFunction = () => {
   return [
@@ -28,70 +31,93 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     (entry) => entry._meta.directory === locale
   );
 
+  const connect = getEntry("connect", locale);
   return {
     recentSnippets: orderBy(snippets, (snippet) => snippet.date, "desc").slice(
       0,
       3
     ),
-
     recentProjects: projects.slice(0, 3),
+    connect,
   };
 };
 
 export default function Index() {
-  const { recentProjects, recentSnippets } = useLoaderData<typeof loader>();
-  const isTransitioning = useViewTransitionState("/snippets/");
+  const intl = useIntl();
+  const { recentProjects, recentSnippets, connect } =
+    useLoaderData<typeof loader>();
 
   return (
     <div className="pt-8">
       <h1
-        className="text-lg inline-block pb-3 font-semibold"
+        className="text-lg inline-block pb-5 font-semibold"
         style={{
           viewTransitionName: "logo",
         }}
       >
         Elmar
       </h1>
-      <Prose>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod eius
-        culpa necessitatibus perspiciatis recusandae error ullam reiciendis quia
-        doloribus impedit corporis veritatis est ipsam, optio accusantium
-        aliquam tempore maxime non.
-      </Prose>
+      <div className="space-y-12">
+        <Prose>
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod eius
+          culpa necessitatibus perspiciatis recusandae error ullam reiciendis
+          quia doloribus impedit corporis veritatis est ipsam, optio accusantium
+          aliquam tempore maxime non.
+        </Prose>
 
-      <div className="grid grid-cols-2 pt-5">
-        <div>
-          <h2 className="pb-3 text-muted-foreground">Projects</h2>
-          <ul className="space-y-2">
+        <div className="grid grid-cols-2">
+          <RecentList title={intl.formatMessage({ id: "projects.recent" })}>
             {recentProjects.map((project) => (
-              <li key={project.slug}>
-                <Link
-                  className="hover:underline"
-                  to={project.url ?? project.github ?? "/projects"}
-                >
+              <RecentListItem key={project.slug}>
+                <Link to={project.url ?? project.github ?? "/projects"}>
                   {project.title}
                 </Link>
-              </li>
+              </RecentListItem>
             ))}
-          </ul>
-        </div>
-        <div>
-          <h2 className="pb-3 text-muted-foreground">Recent Snippets</h2>
-          <ul className="space-y-2">
+          </RecentList>
+
+          <RecentList title={intl.formatMessage({ id: "snippets.recent" })}>
             {recentSnippets.map((snippet) => (
-              <li key={snippet.slug}>
+              <RecentListItem key={snippet.slug}>
                 <ViewTransitionLink
                   name="snippet-title"
-                  className="hover:underline"
                   to={`/snippets/${snippet.slug}`}
                 >
                   {snippet.title}
                 </ViewTransitionLink>
-              </li>
+              </RecentListItem>
             ))}
-          </ul>
+          </RecentList>
+        </div>
+
+        <SpotifyWidget />
+
+        <div>
+          <h2 className="pb-5 text-muted-foreground">Connect</h2>
+          <Prose>
+            <MDXContent code={connect.content} />
+          </Prose>
         </div>
       </div>
     </div>
   );
 }
+
+const RecentList = ({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) => {
+  return (
+    <div>
+      <h2 className="pb-5 text-muted-foreground">{title}</h2>
+      <ul className="space-y-3">{children}</ul>
+    </div>
+  );
+};
+
+const RecentListItem = ({ children }: { children: React.ReactNode }) => {
+  return <li className="hover:underline">{children}</li>;
+};

@@ -1,31 +1,33 @@
+import config from "content.config";
 import * as collections from "app:content";
+import { GetTypeByName } from "@content-collections/core";
 
-export type CollectionName = keyof typeof collections extends `all${infer Name}`
-  ? Lowercase<Name>
-  : never;
-
-export type Collection<T extends CollectionName> =
-  (typeof collections)[`all${Capitalize<T>}`];
-
-export type CollectionEntry<T extends CollectionName> = Collection<T>[number];
+type CollectionName = (typeof config.collections)[number]["name"];
+type CollectionEntry<TName extends CollectionName> = GetTypeByName<
+  typeof config,
+  TName
+>;
+type Collection<TName extends CollectionName> = Array<CollectionEntry<TName>>;
 
 export function getCollection<T extends CollectionName>(
   collection: T,
-  filter?: (
-    entry: CollectionEntry<T>,
-    index: number,
-    collection: Collection<T>
-  ) => boolean
+  filter?: (entry: CollectionEntry<T>, index: number) => boolean
 ): Collection<T> {
-  const result = collections[`all${capitalize(collection)}`];
+  const result = getAll(collection);
 
   if (filter) {
-    return result.filter((entry, index, collection) =>
-      filter(entry, index, collection)
-    );
+    return result.filter((entry, index) => filter(entry, index));
   }
 
   return result;
+}
+
+function getAll<T extends CollectionName>(collection: T): Collection<T> {
+  const key = collection.endsWith("s") ? collection : `${collection}s`;
+
+  return collections[
+    `all${capitalize(key)}` as keyof typeof collections
+  ] as any;
 }
 
 export function getEntry<TName extends CollectionName>(

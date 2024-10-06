@@ -74,10 +74,27 @@ const projects = defineCollection({
   },
 });
 
+const connect = defineCollection({
+  name: "connect",
+  directory: "app/content/connect",
+  include: "**/*.mdx",
+  schema: (z) => ({
+    // title: z.string(),
+  }),
+  transform: async (document, context) => {
+    const content = await compileMDX(context, document);
+
+    return {
+      ...document,
+      content,
+    };
+  },
+});
+
 function slugify(doc: Schema<"frontmatter", {}>) {
   return doc._meta.fileName.split(".")[0];
 }
 
 export default defineConfig({
-  collections: [snippets, projects],
+  collections: [snippets, projects, connect],
 });

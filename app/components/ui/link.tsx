@@ -2,11 +2,12 @@ import { Link as RemixLink } from "@remix-run/react";
 import * as React from "react";
 import { useIntl } from "react-intl";
 import { $i18n } from "~/i18n/routing";
-import { focusRing } from "~/lib/styles";
+import { cx, focusRing } from "~/lib/styles";
+import { Icon } from "./icon";
 
 interface LinkProps extends React.ComponentPropsWithoutRef<typeof RemixLink> {}
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
-  ({ className, to, ...props }, ref) => {
+  ({ className, to, children, ...props }, ref) => {
     const intl = useIntl();
 
     const _to = React.useMemo(() => {
@@ -24,13 +25,23 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       return to;
     }, [to, intl.locale]);
 
+    const isExternal =
+      typeof _to === "string" &&
+      (_to.startsWith("http") || _to.startsWith("www"));
+
     return (
       <RemixLink
         ref={ref}
         to={_to}
-        className={focusRing({ className })}
+        className={cx(
+          "inline-flex items-center gap-1",
+          focusRing({ className })
+        )}
         {...props}
-      />
+      >
+        {children}
+        {isExternal && <Icon.ArrowRight className="size-4 -rotate-45" />}
+      </RemixLink>
     );
   }
 );

@@ -16,12 +16,20 @@ import { IntlProvider } from "react-intl";
 import en from "~/lang/en.json";
 import nl from "~/lang/nl.json";
 
-import "./tailwind.css";
+import "./index.css";
 
 const messages = {
   en,
   nl,
 };
+
+declare global {
+  namespace FormatjsIntl {
+    interface Message {
+      ids: keyof typeof nl;
+    }
+  }
+}
 
 export const shouldRevalidate = ({
   currentParams,

@@ -1,0 +1,1 @@
+Als je geïnteresseerd bent in het inhuren van mij, neem dan contact met mij op via [email](mailto:elmarvanriet@gmail.com), of als je meer wilt zien, bekijk dan mijn [github](https://github.com/elmarvr).

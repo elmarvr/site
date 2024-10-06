@@ -1,6 +1,4 @@
-- Add snippets
-- Animations transition
-- Add Projects
-- Focus ring
+- Add Projects (Receipt Wip)
 - Logo
-- replace hover hover with screen width
+- Add titles to the pages
+- Add a footer

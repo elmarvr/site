@@ -3,6 +3,11 @@
   "nav.snippets": "Snippets",
   "nav.language": "Taal",
 
+  "projects.recent": "Recente projecten",
+  "projects.all": "Alle projecten",
+  "snippets.recent": "Recente snippets",
+  "snippets.all": "Alle snippets",
+
   "general.next": "Volgende",
   "general.previous": "Vorige",
 
