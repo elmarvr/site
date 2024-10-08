@@ -1,7 +1,16 @@
 node_modules
-.content-collections
+
 
 /.cache
 /build
 .env
+
+.content-collections
+
 .DS_Store
+
+.dev.vars
+.wrangler/
+
+# sst
+.sst

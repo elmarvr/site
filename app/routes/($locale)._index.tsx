@@ -3,11 +3,13 @@ import { useLoaderData } from "@remix-run/react";
 import { i18n } from "i18n.config";
 import React from "react";
 import { useIntl } from "react-intl";
+import { Resource } from "sst";
 import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { ViewTransitionLink } from "~/components/view-transition-link";
 import { getCollection, getEntry } from "~/lib/collection";
+import { spotify } from "~/lib/spotify";
 import { orderBy } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
@@ -31,6 +33,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     (entry) => entry._meta.directory === locale
   );
 
+  const response = await spotify.currentlyPlaying.$get();
+  const item = await response.json();
+
   const connect = getEntry("connect", locale);
   return {
     recentSnippets: orderBy(snippets, (snippet) => snippet.date, "desc").slice(
@@ -39,12 +44,13 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     ),
     recentProjects: projects.slice(0, 3),
     connect,
+    item,
   };
 };
 
 export default function Index() {
   const intl = useIntl();
-  const { recentProjects, recentSnippets, connect } =
+  const { recentProjects, recentSnippets, connect, item } =
     useLoaderData<typeof loader>();
 
   return (
@@ -91,6 +97,8 @@ export default function Index() {
         </div>
 
         <SpotifyWidget />
+
+        {JSON.stringify(item, null, 2)}
 
         <div>
           <h2 className="pb-5 text-muted-foreground">Connect</h2>
