@@ -14,7 +14,11 @@ import { Tooltip } from "~/components/ui/tooltip";
 export const links = () => {
   return [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: true },
+    {
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossOrigin: "true",
+    },
     {
       href: "https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap",
       rel: "stylesheet",
@@ -41,7 +45,7 @@ export default function LocaleLayout() {
   const location = useLocation();
 
   return (
-    <div className="px-2 mx-auto max-w-2xl">
+    <div className="px-2 mx-auto max-w-xl">
       <header className="sticky top-0 z-20 bg-background">
         <nav className="flex justify-between items-center w-full py-3 rounded">
           {location.pathname !== $i18n("/", intl.locale) ? (

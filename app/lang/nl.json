@@ -14,5 +14,8 @@
   "plural.one": "ste",
   "plural.two": "de",
   "plural.few": "de",
-  "plural.other": "de"
+  "plural.other": "de",
+
+  "player.listening-now": "Luistert nu",
+  "player.last-played-at": "Laatst afgespeeld op"
 }

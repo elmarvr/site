@@ -15,7 +15,7 @@
     --color-accent-foreground: theme(colors.zinc.100);
     --color-muted: theme(colors.zinc.700);
     --color-muted-foreground: theme(colors.zinc.500);
-    --color-card: theme(colors.zinc.800);
+    --color-card: 210 10% 15%;
     --color-card-foreground: theme(colors.zinc.100);
 
     --color-border: theme(colors.zinc.700);

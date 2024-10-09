@@ -22,3 +22,7 @@ export function orderBy<TItem, TKey>(
     return 0;
   });
 }
+
+export function isExternalUrl(url: string) {
+  return url.startsWith("http") || url.startsWith("www");
+}

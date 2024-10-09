@@ -4,6 +4,7 @@ import { useIntl } from "react-intl";
 import { $i18n } from "~/i18n/routing";
 import { cx, focusRing } from "~/lib/styles";
 import { Icon } from "./icon";
+import { isExternalUrl } from "~/lib/utils";
 
 interface LinkProps extends React.ComponentPropsWithoutRef<typeof RemixLink> {}
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
@@ -25,9 +26,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
       return to;
     }, [to, intl.locale]);
 
-    const isExternal =
-      typeof _to === "string" &&
-      (_to.startsWith("http") || _to.startsWith("www"));
+    const isExternal = typeof to === "string" && isExternalUrl(to);
 
     return (
       <RemixLink
@@ -40,7 +39,9 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         {...props}
       >
         {children}
-        {isExternal && <Icon.ArrowRight className="size-4 -rotate-45" />}
+        {isExternal && (
+          <Icon.ArrowRight className="size-3.5 mt-0.5 -rotate-45 text-primary" />
+        )}
       </RemixLink>
     );
   }

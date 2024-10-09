@@ -33,8 +33,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     (entry) => entry._meta.directory === locale
   );
 
-  const response = await spotify.currentlyPlaying.$get();
-  const item = await response.json();
+  const response = await spotify.playbackState.$get();
+  const playbackState = await response.json();
 
   const connect = getEntry("connect", locale);
   return {
@@ -44,13 +44,13 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     ),
     recentProjects: projects.slice(0, 3),
     connect,
-    item,
+    playbackState,
   };
 };
 
 export default function Index() {
   const intl = useIntl();
-  const { recentProjects, recentSnippets, connect, item } =
+  const { recentProjects, recentSnippets, connect, playbackState } =
     useLoaderData<typeof loader>();
 
   return (
@@ -96,9 +96,7 @@ export default function Index() {
           </RecentList>
         </div>
 
-        <SpotifyWidget />
-
-        {JSON.stringify(item, null, 2)}
+        <SpotifyWidget state={playbackState} />
 
         <div>
           <h2 className="pb-5 text-muted-foreground">Connect</h2>

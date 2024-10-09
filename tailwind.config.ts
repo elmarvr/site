@@ -19,7 +19,7 @@ export default {
         "accent-foreground": "var(--color-accent-foreground)",
         muted: "var(--color-muted)",
         "muted-foreground": "var(--color-muted-foreground)",
-        card: "var(--color-card)",
+        card: "hsl(var(--color-card))",
         "card-foreground": "var(--color-card-foreground)",
 
         border: "var(--color-border)",

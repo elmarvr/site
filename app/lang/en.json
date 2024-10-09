@@ -14,5 +14,8 @@
   "plural.one": "st",
   "plural.two": "nd",
   "plural.few": "rd",
-  "plural.other": "th"
+  "plural.other": "th",
+
+  "player.listening-now": "Listening now",
+  "player.last-played-at": "Last played at"
 }

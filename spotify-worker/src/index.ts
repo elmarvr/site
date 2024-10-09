@@ -14,46 +14,64 @@ const app = new Hono()
     return c.json({ error: error.message }, { status: 500 });
   });
 
-const routes = app
-  .get("/lastPlayed", async (c) => {
-    const response = await spotify("me/player/recently-played");
+const routes = app.get("playbackState", async (c) => {
+  const response = await spotify("me/player");
 
-    const json = await response.json();
-
-    const { items } = z
-      .object({
-        items: z.array(z.any()),
-      })
-      .parse(json);
-
-    return c.json(items[0]);
-  })
-  .get("/isPlaying", async (c) => {
-    const response = await spotify("me/player/currently-playing");
-
-    if (response.status === 204) {
-      return c.json({
-        isPlaying: false,
-      });
-    }
+  if (response.status === 204) {
+    const { track, played_at } = await getLastPlayed();
 
     return c.json({
-      isPlaying: true,
+      track,
+      timestamp: new Date(played_at).getTime(),
+      isPlaying: false,
     });
-  })
-  .get("accessToken", async (c) => {
-    const accessToken = await getAccessToken();
-    return c.json({ accessToken });
+  }
+
+  const json = await response.json();
+  const { item, timestamp, is_playing } = z
+    .object({
+      item: trackSchema,
+      is_playing: z.boolean(),
+      timestamp: z.number(),
+    })
+    .parse(json);
+
+  return c.json({
+    track: item,
+    timestamp,
+    isPlaying: is_playing,
   });
+});
+
+async function getLastPlayed() {
+  const response = await spotify("me/player/recently-played");
+
+  const json = await response.json();
+
+  const { items } = z
+    .object({
+      items: z.array(
+        z.object({
+          track: trackSchema,
+          played_at: z.string(),
+        })
+      ),
+    })
+    .parse(json);
+
+  return items[0];
+}
 
 async function spotify(endpoint: string) {
   const accessToken = await getAccessToken();
 
-  return fetch(`https://api.spotify.com/v1/${endpoint}`, {
+  const response = await fetch(`https://api.spotify.com/v1/${endpoint}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
+  return response;
 }
 
 async function getAccessToken() {
@@ -92,6 +110,47 @@ async function getAccessToken() {
 
   return access_token;
 }
+
+const externalUrlSchema = z
+  .object({
+    external_urls: z.object({
+      spotify: z.string(),
+    }),
+  })
+  .transform(({ external_urls, ...value }) => ({
+    ...value,
+    externalUrl: external_urls.spotify,
+  }));
+
+const artistSchema = z
+  .object({
+    name: z.string(),
+  })
+  .and(externalUrlSchema);
+
+const albumSchema = z
+  .object({
+    name: z.string(),
+    images: z.array(
+      z.object({
+        url: z.string(),
+      })
+    ),
+  })
+  .transform(({ images, ...value }) => ({
+    ...value,
+    imageUrl: images[0].url,
+  }))
+  .and(externalUrlSchema);
+
+const trackSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    album: albumSchema,
+    artists: z.array(artistSchema.and(externalUrlSchema)),
+  })
+  .and(externalUrlSchema);
 
 export type App = typeof routes;
 export default app;

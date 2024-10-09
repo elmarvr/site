@@ -79,7 +79,6 @@ const ProjectLink = ({
   return (
     <Link className="flex items-center gap-1 group hover:underline" to={to}>
       {children}
-      <Icon.ArrowRight className="-rotate-45 size-3.5 text-primary mt-0.5" />
     </Link>
   );
 };
