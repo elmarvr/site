@@ -11,7 +11,6 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "hono": "^4.6.2",
     "@formatjs/intl-localematcher": "^0.5.4",
     "@iconify-json/ph": "^1.2.0",
     "@radix-ui/react-collection": "^1.1.0",
@@ -27,6 +26,7 @@
     "@remix-run/react": "^2.11.2",
     "@remix-run/serve": "^2.11.2",
     "cva": "beta",
+    "hono": "^4.6.2",
     "isbot": "^4.1.0",
     "nanoid": "^5.0.7",
     "negotiator": "^0.6.3",
@@ -60,6 +60,7 @@
     "expo-file-system": "^17.0.1",
     "expo-sqlite": "^14.0.6",
     "mdast": "^3.0.0",
+    "mdx-bundler": "^10.0.3",
     "openai": "^4.61.1",
     "postcss": "^8.4.38",
     "react-hook-form": "^7.53.0",

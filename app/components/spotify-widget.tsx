@@ -1,6 +1,8 @@
 import { spotify } from "~/lib/spotify";
 import { InferResponseType } from "hono/client";
 import { FormattedDate, FormattedMessage } from "react-intl";
+import { Fragment } from "react/jsx-runtime";
+import { cx, focusRing } from "~/lib/styles";
 
 type PlaybackState = InferResponseType<typeof spotify.playbackState.$get>;
 
@@ -18,17 +20,22 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
           )}
         </div>
         <div className="ml-4">
-          <p className="font-medium">{track.name}</p>
+          <a href={track.externalUrl} className="font-medium">
+            {track.name}
+          </a>
           <p className="text-sm text-muted-foreground">
             {track.artists.map((artist, index) => (
-              <>
+              <Fragment key={artist.externalUrl}>
                 {
-                  <a href={artist.externalUrl} className="hover:underline">
+                  <a
+                    href={artist.externalUrl}
+                    className={cx(focusRing(), "hover:underline")}
+                  >
                     {artist.name}
                   </a>
                 }
                 {index < track.artists.length - 1 ? ", " : ""}
-              </>
+              </Fragment>
             ))}
           </p>
         </div>

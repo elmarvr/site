@@ -3,7 +3,7 @@ import * as collections from "app:content";
 import { GetTypeByName } from "@content-collections/core";
 
 type CollectionName = (typeof config.collections)[number]["name"];
-type CollectionEntry<TName extends CollectionName> = GetTypeByName<
+export type CollectionEntry<TName extends CollectionName> = GetTypeByName<
   typeof config,
   TName
 >;

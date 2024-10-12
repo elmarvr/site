@@ -1,6 +1,0 @@
-- Add Projects (Receipt Wip)
-- Add titles to the pages (meta)
-- Add a footer
-- Snippet sorting bug
-- Make code snippets scrollable
-- Add favicon (squarcle)

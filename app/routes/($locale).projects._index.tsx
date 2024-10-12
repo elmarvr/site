@@ -1,12 +1,22 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { i18n } from "i18n.config";
 
-import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { getCollection } from "~/lib/collection";
 import { MDXContent } from "~/mdx/client";
+
+export const meta = ({ params }: MetaArgs) => {
+  const locale = params.locale ?? i18n.defaultLocale;
+
+  return [
+    {
+      // Could pass the intl object from entry.server.ts but it's feels like a lot effort for a single title
+      title: `Elmar | ${locale === "en" ? "Projects" : "Projecten"}`,
+    },
+  ];
+};
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;

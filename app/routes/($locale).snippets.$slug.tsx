@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { i18n } from "i18n.config";
 import { FormattedMessage } from "react-intl";
@@ -6,10 +6,20 @@ import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { useViewTransitionState } from "~/hooks/use-view-transition";
-
 import { getEntry } from "~/lib/collection";
 import { attr } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
+
+export const meta = ({ params }: MetaArgs) => {
+  const locale = params.locale ?? i18n.defaultLocale;
+  const snippet = getEntry("snippets", `${locale}/${params.slug}`);
+
+  return [
+    {
+      title: `Elmar | ${snippet.title}`,
+    },
+  ];
+};
 
 export const loader = ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;
@@ -50,7 +60,9 @@ export default function SnippetSlug() {
         <MDXContent code={snippet.content} />
       </Prose>
 
-      <div className="py-5 flex justify-between">
+      <div className="my-5 h-px bg-card w-full" />
+
+      <div className="pb-5 flex justify-between">
         {snippet.previous && (
           <Link
             className="flex flex-col items-start group"

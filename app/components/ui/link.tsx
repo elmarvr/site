@@ -1,7 +1,7 @@
 import { Link as RemixLink } from "@remix-run/react";
 import * as React from "react";
 import { useIntl } from "react-intl";
-import { $i18n } from "~/i18n/routing";
+import { $i18n } from "~/i18n/route";
 import { cx, focusRing } from "~/lib/styles";
 import { Icon } from "./icon";
 import { isExternalUrl } from "~/lib/utils";

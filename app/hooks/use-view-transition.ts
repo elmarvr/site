@@ -1,7 +1,7 @@
 import { unstable_useViewTransitionState, useLocation } from "@remix-run/react";
 import type { To, RelativeRoutingType } from "@remix-run/router";
 import { useIntl } from "react-intl";
-import { $i18n } from "~/i18n/routing";
+import { $i18n } from "~/i18n/route";
 
 function useViewTransitionState(opts?: {
   relative?: RelativeRoutingType;

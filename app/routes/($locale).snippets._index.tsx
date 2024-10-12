@@ -3,21 +3,26 @@ import { useLoaderData } from "@remix-run/react";
 import { FormattedDate, FormattedPlural, useIntl } from "react-intl";
 import { i18n } from "i18n.config";
 
-import { Icon } from "~/components/ui/icon";
-import { Link } from "~/components/ui/link";
-import { useViewTransitionState } from "~/hooks/use-view-transition";
 import { CollectionEntry, getCollection } from "~/lib/collection";
 import { ViewTransitionLink } from "~/components/view-transition-link";
+import { orderBy } from "~/lib/utils";
+
+export const meta = () => {
+  return [
+    {
+      title: "Elmar | Snippets",
+    },
+  ];
+};
 
 export const loader = ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;
 
-  const snippets = getCollection(
-    "snippets",
-    (entry) => entry._meta.directory === locale
+  const snippets = orderBy(
+    getCollection("snippets", (entry) => entry._meta.directory === locale),
+    (snippet) => snippet.date,
+    "desc"
   );
-
-  snippets.sort((a, b) => (a.date > b.date ? -1 : 1));
 
   const grouped: {
     date: Date;

@@ -5,11 +5,19 @@ import { i18n } from "i18n.config";
 
 import { LocaleSelect } from "~/components/locale-select";
 import { detectLocale } from "~/i18n/detect-locale.server";
-import { $i18n } from "~/i18n/routing";
+import { $i18n } from "~/i18n/route";
 import { Link } from "~/components/ui/link";
 import { Icon } from "~/components/ui/icon";
 import { Button } from "~/components/ui/button";
 import { Tooltip } from "~/components/ui/tooltip";
+
+export const meta = () => {
+  return [
+    {
+      title: "Elmar",
+    },
+  ];
+};
 
 export const links = () => {
   return [
@@ -45,7 +53,7 @@ export default function LocaleLayout() {
   const location = useLocation();
 
   return (
-    <div className="px-2 mx-auto max-w-xl">
+    <div className="px-2 mx-auto max-w-2xl">
       <header className="sticky top-0 z-20 bg-background">
         <nav className="flex justify-between items-center w-full py-3 rounded">
           {location.pathname !== $i18n("/", intl.locale) ? (

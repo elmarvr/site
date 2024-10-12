@@ -7,6 +7,23 @@ import {
 import { compileMDX } from "~/mdx/compile";
 import { orderBy } from "~/lib/utils";
 
+const introduction = defineCollection({
+  name: "introduction",
+  directory: "app/content/introduction",
+  include: "**/*.mdx",
+  schema: (z) => ({
+    // title: z.string(),
+  }),
+  transform: async (document, context) => {
+    const content = await compileMDX(context, document);
+
+    return {
+      ...document,
+      content,
+    };
+  },
+});
+
 const snippets = defineCollection({
   name: "snippets",
   directory: "app/content/snippets",
@@ -21,7 +38,8 @@ const snippets = defineCollection({
 
     const docs = orderBy(
       await context.collection.documents(),
-      (doc) => doc.date
+      (doc) => doc.date,
+      "desc"
     ).filter((doc) => doc._meta.directory === locale);
 
     const index = docs.findIndex(
@@ -96,5 +114,5 @@ function slugify(doc: Schema<"frontmatter", {}>) {
 }
 
 export default defineConfig({
-  collections: [snippets, projects, connect],
+  collections: [introduction, snippets, projects, connect],
 });

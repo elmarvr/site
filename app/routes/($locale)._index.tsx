@@ -1,9 +1,8 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { i18n } from "i18n.config";
 import React from "react";
 import { useIntl } from "react-intl";
-import { Resource } from "sst";
 import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
@@ -13,19 +12,15 @@ import { spotify } from "~/lib/spotify";
 import { orderBy } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
-
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const locale = params.locale ?? i18n.defaultLocale;
 
-  const snippets = getCollection(
-    "snippets",
-    (entry) => entry._meta.directory === locale
+  const introduction = getEntry("introduction", locale);
+
+  const snippets = orderBy(
+    getCollection("snippets", (entry) => entry._meta.directory === locale),
+    (snippet) => snippet.date,
+    "desc"
   );
 
   const projects = getCollection(
@@ -37,21 +32,25 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const playbackState = await response.json();
 
   const connect = getEntry("connect", locale);
+
   return {
-    recentSnippets: orderBy(snippets, (snippet) => snippet.date, "desc").slice(
-      0,
-      3
-    ),
+    introduction,
+    recentSnippets: snippets.slice(0, 3),
     recentProjects: projects.slice(0, 3),
-    connect,
     playbackState,
+    connect,
   };
 };
 
 export default function Index() {
   const intl = useIntl();
-  const { recentProjects, recentSnippets, connect, playbackState } =
-    useLoaderData<typeof loader>();
+  const {
+    introduction,
+    recentProjects,
+    recentSnippets,
+    playbackState,
+    connect,
+  } = useLoaderData<typeof loader>();
 
   return (
     <div className="pt-8">
@@ -65,10 +64,7 @@ export default function Index() {
       </h1>
       <div className="space-y-12">
         <Prose>
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod eius
-          culpa necessitatibus perspiciatis recusandae error ullam reiciendis
-          quia doloribus impedit corporis veritatis est ipsam, optio accusantium
-          aliquam tempore maxime non.
+          <MDXContent code={introduction.content} />
         </Prose>
 
         <div className="grid grid-cols-2">

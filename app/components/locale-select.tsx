@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "@remix-run/react";
 import { FormattedDisplayName, useIntl } from "react-intl";
 import { i18n } from "i18n.config";
 import { Select, SelectContentProps } from "./ui/select";
-import { $i18n } from "~/i18n/routing";
+import { $i18n } from "~/i18n/route";
 
 interface LocaleSelectProps extends Pick<SelectContentProps, "side" | "align"> {
   children: React.ReactNode;
