@@ -1,10 +1,7 @@
-import { spotify } from "~/lib/spotify";
-import { InferResponseType } from "hono/client";
 import { FormattedDate, FormattedMessage } from "react-intl";
 import { Fragment } from "react/jsx-runtime";
+import { PlaybackState } from "~/lib/spotify.server";
 import { cx, focusRing } from "~/lib/styles";
-
-type PlaybackState = InferResponseType<typeof spotify.playbackState.$get>;
 
 export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
   const { track, isPlaying, timestamp } = state;
