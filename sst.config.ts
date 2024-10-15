@@ -3,7 +3,7 @@
 export default $config({
   app(input) {
     return {
-      name: "portfolio-remix",
+      name: "elmar-site",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
@@ -33,6 +33,7 @@ export default $config({
 
     new sst.aws.Remix("MyWeb", {
       link: [worker],
+      domain: "elmarvr.com",
     });
   },
 });
