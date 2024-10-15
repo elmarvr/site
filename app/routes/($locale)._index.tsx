@@ -8,7 +8,6 @@ import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { ViewTransitionLink } from "~/components/view-transition-link";
 import { getCollection, getEntry } from "~/lib/collection";
-import { spotify } from "~/lib/spotify";
 import { orderBy } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
@@ -28,29 +27,20 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     (entry) => entry._meta.directory === locale
   );
 
-  const response = await spotify.playbackState.$get();
-  const playbackState = await response.json();
-
   const connect = getEntry("connect", locale);
 
   return {
     introduction,
     recentSnippets: snippets.slice(0, 3),
     recentProjects: projects.slice(0, 3),
-    playbackState,
     connect,
   };
 };
 
 export default function Index() {
   const intl = useIntl();
-  const {
-    introduction,
-    recentProjects,
-    recentSnippets,
-    playbackState,
-    connect,
-  } = useLoaderData<typeof loader>();
+  const { introduction, recentProjects, recentSnippets, connect } =
+    useLoaderData<typeof loader>();
 
   return (
     <div className="pt-8">
@@ -92,7 +82,7 @@ export default function Index() {
           </RecentList>
         </div>
 
-        <SpotifyWidget state={playbackState} />
+        {/* <SpotifyWidget state={playbackState} /> */}
 
         <div>
           <h2 className="pb-5 text-muted-foreground">Connect</h2>
