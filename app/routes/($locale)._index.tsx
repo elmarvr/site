@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import React from "react";
+import { Await, defer, useLoaderData } from "@remix-run/react";
+import React, { Suspense } from "react";
 import { useIntl } from "react-intl";
 import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
@@ -31,6 +31,7 @@ export const meta = ({ data }: MetaArgs<typeof loader>) => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const intl = await createServerIntl(request);
   const seo = await generateSeoMeta(request);
+
   const title = intl.formatMessage({ id: "page.index.title" });
   const description = intl.formatMessage({ id: "page.index.description" });
 
@@ -47,20 +48,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     (entry) => entry._meta.directory === intl.locale
   );
 
-  const playbackState = await getPlaybackState();
-
   const connect = getEntry("connect", intl.locale);
 
-  return {
+  return defer({
     introduction,
     recentSnippets: snippets.slice(0, 3),
     recentProjects: projects.slice(0, 3),
-    playbackState,
+    playbackState: getPlaybackState(),
     connect,
     seo,
     title,
     description,
-  };
+  });
 };
 
 export default function Index() {
@@ -113,7 +112,17 @@ export default function Index() {
           </RecentList>
         </div>
 
-        <SpotifyWidget state={playbackState} />
+        <div>
+          <Suspense
+            fallback={
+              <div className="h-[100px] bg-card/20 rounded animate-pulse"></div>
+            }
+          >
+            <Await resolve={playbackState}>
+              {(state) => <SpotifyWidget state={state} />}
+            </Await>
+          </Suspense>
+        </div>
 
         <div>
           <h2 className="pb-5 text-muted-foreground">Connect</h2>
