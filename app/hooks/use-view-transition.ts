@@ -1,7 +1,7 @@
 import { unstable_useViewTransitionState, useLocation } from "@remix-run/react";
-import type { To, RelativeRoutingType } from "@remix-run/router";
+import type { RelativeRoutingType, To } from "@remix-run/router";
 import { useIntl } from "react-intl";
-import { $i18n } from "~/i18n/route";
+import { localePath } from "~/i18n/core";
 
 function useViewTransitionState(opts?: {
   relative?: RelativeRoutingType;
@@ -14,11 +14,11 @@ function useViewTransitionState(...args: any[]) {
   const to = typeof args[0] === "string" ? args[0] : location.pathname;
   const opts = typeof args[0] === "object" ? args[0] : args[1];
 
-  return unstable_useViewTransitionState($i18n(to, intl.locale), opts);
+  return unstable_useViewTransitionState(localePath(to, intl.locale), opts);
 }
 
 interface ViewTransitionOptions {
   relative?: RelativeRoutingType;
 }
 
-export { type ViewTransitionOptions, useViewTransitionState };
+export { useViewTransitionState, type ViewTransitionOptions };

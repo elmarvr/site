@@ -6,23 +6,24 @@ import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { useViewTransitionState } from "~/hooks/use-view-transition";
+import { detectLocale } from "~/i18n/server";
 import { getEntry } from "~/lib/collection";
 import { attr } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
 export const meta = ({ params }: MetaArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
-  const snippet = getEntry("snippets", `${locale}/${params.slug}`);
+  // const locale = await detectLocale(request);
+  // const snippet = getEntry("snippets", `${locale}/${params.slug}`);
 
   return [
     {
-      title: `Elmar | ${snippet.title}`,
+      // title: `Elmar | ${snippet.title}`,
     },
   ];
 };
 
-export const loader = ({ params }: LoaderFunctionArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const locale = await detectLocale(request);
 
   const snippet = getEntry("snippets", `${locale}/${params.slug}`);
 

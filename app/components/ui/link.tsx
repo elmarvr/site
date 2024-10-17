@@ -1,37 +1,20 @@
 import { Link as RemixLink } from "@remix-run/react";
 import * as React from "react";
-import { useIntl } from "react-intl";
-import { $i18n } from "~/i18n/route";
 import { cx, focusRing } from "~/lib/styles";
 import { Icon } from "./icon";
 import { isExternalUrl } from "~/lib/utils";
+import { LocaleLink, type LocaleLinkProps } from "~/i18n/react";
 
-interface LinkProps extends React.ComponentPropsWithoutRef<typeof RemixLink> {}
+interface LinkProps extends LocaleLinkProps {}
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ className, to, children, ...props }, ref) => {
-    const intl = useIntl();
-
-    const _to = React.useMemo(() => {
-      if (typeof to === "string") {
-        return $i18n(to, intl.locale);
-      }
-
-      if (to.pathname) {
-        return {
-          ...to,
-          pathname: $i18n(to.pathname, intl.locale),
-        };
-      }
-
-      return to;
-    }, [to, intl.locale]);
-
     const isExternal = typeof to === "string" && isExternalUrl(to);
+    const Comp = isExternal ? RemixLink : LocaleLink;
 
     return (
-      <RemixLink
+      <Comp
         ref={ref}
-        to={_to}
+        to={to}
         className={cx(
           "inline-flex items-center gap-1",
           focusRing({ className })
@@ -42,7 +25,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         {isExternal && (
           <Icon.ArrowRight className="size-3.5 mt-0.5 -rotate-45 text-primary" />
         )}
-      </RemixLink>
+      </Comp>
     );
   }
 );

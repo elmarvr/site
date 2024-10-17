@@ -1,25 +1,25 @@
 import { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { i18n } from "i18n.config";
 
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
+import { detectLocale } from "~/i18n/server";
 import { getCollection } from "~/lib/collection";
 import { MDXContent } from "~/mdx/client";
 
-export const meta = ({ params }: MetaArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
+export const meta = () => {
+  // const locale = await detectLocale(request);
 
   return [
     {
       // Could pass the intl object from entry.server.ts but it's feels like a lot effort for a single title
-      title: `Elmar | ${locale === "en" ? "Projects" : "Projecten"}`,
+      // title: `Elmar | ${locale === "en" ? "Projects" : "Projecten"}`,
     },
   ];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const locale = await detectLocale(request);
 
   const projects = getCollection(
     "projects",
@@ -45,33 +45,39 @@ export default function Projects() {
               animationDelay: `${100 * index}ms`,
             }}
           >
-            <div className="flex justify-between items-center">
+            <div className="flex items-center">
               <h2 className="font-semibold">{project.title}</h2>
 
-              <ul className="flex gap-2">
-                {project.skills.map((skill) => {
-                  return (
-                    <li
-                      className="bg-card py-0.5 px-2 text-xs rounded"
-                      key={skill.name}
-                    >
-                      {skill.name}
-                    </li>
-                  );
-                })}
-              </ul>
+              {[project.url, project.github].filter(Boolean).length > 0 && (
+                <div className="h-[1em] w-px bg-border mx-5" />
+              )}
+
+              <div className="flex gap-3">
+                {project.url && (
+                  <ProjectLink to={project.url}>Live</ProjectLink>
+                )}
+                {project.github && (
+                  <ProjectLink to={project.github}>Source</ProjectLink>
+                )}
+              </div>
             </div>
 
             <Prose>
               <MDXContent code={project.content} />
             </Prose>
 
-            <div className="flex gap-3">
-              {project.url && <ProjectLink to={project.url}>Live</ProjectLink>}
-              {project.github && (
-                <ProjectLink to={project.github}>Source</ProjectLink>
-              )}
-            </div>
+            <ul className="flex  flex-wrap gap-2">
+              {project.skills.map((skill) => {
+                return (
+                  <li
+                    className="bg-card py-0.5 px-2 text-xs rounded"
+                    key={skill.name}
+                  >
+                    {skill.name}
+                  </li>
+                );
+              })}
+            </ul>
           </li>
         );
       })}

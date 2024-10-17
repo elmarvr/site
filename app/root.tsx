@@ -2,34 +2,24 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
 import {
   isRouteErrorResponse,
+  json,
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useParams,
   useRouteError,
 } from "@remix-run/react";
 import { i18n } from "i18n.config";
-import { IntlProvider } from "react-intl";
-
-import en from "~/lang/en.json";
-import nl from "~/lang/nl.json";
 
 import "./index.css";
-
-const messages = {
-  en,
-  nl,
-};
-
-declare global {
-  namespace FormatjsIntl {
-    interface Message {
-      ids: keyof typeof nl;
-    }
-  }
-}
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { I18nProvider } from "./i18n/react";
+import { localePath } from "./i18n/core";
+import { detectLocale } from "./i18n/server";
 
 export const shouldRevalidate = ({
   currentParams,
@@ -40,17 +30,24 @@ export const shouldRevalidate = ({
   }
 };
 
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const locale = await detectLocale(request);
+
+  if (!params.locale && locale !== i18n.defaultLocale) {
+    const { pathname } = new URL(request.url);
+
+    return redirect(localePath(pathname, locale));
+  }
+
+  return json({ locale });
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
-  const params = useParams();
-  const locale = params?.locale ?? i18n.defaultLocale;
+  const { locale } = useLoaderData<typeof loader>();
 
   return (
     <TooltipProvider>
-      <IntlProvider
-        locale={locale}
-        defaultLocale={locale}
-        messages={messages[locale as keyof typeof messages]}
-      >
+      <I18nProvider locale={locale}>
         <html lang={locale}>
           <head>
             <meta charSet="utf-8" />
@@ -67,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Scripts />
           </body>
         </html>
-      </IntlProvider>
+      </I18nProvider>
     </TooltipProvider>
   );
 }

@@ -1,15 +1,10 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Outlet, redirect, useLocation } from "@remix-run/react";
+import { Link, Outlet, useLocation, useMatch } from "@remix-run/react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { i18n } from "i18n.config";
-
 import { LocaleSelect } from "~/components/locale-select";
-import { detectLocale } from "~/i18n/detect-locale.server";
-import { $i18n } from "~/i18n/route";
-import { Link } from "~/components/ui/link";
-import { Icon } from "~/components/ui/icon";
 import { Button } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
 import { Tooltip } from "~/components/ui/tooltip";
+import { localePath } from "~/i18n/core";
 
 export const meta = () => {
   return [
@@ -34,29 +29,16 @@ export const links = () => {
   ];
 };
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const detected = detectLocale(request);
-
-  if (params.locale && !i18n.locales.includes(params.locale)) {
-    throw new Error("Invalid locale");
-  }
-
-  if (!params.locale && detected !== i18n.defaultLocale) {
-    return redirect($i18n(request.url, detected));
-  }
-
-  return null;
-};
-
 export default function LocaleLayout() {
   const intl = useIntl();
-  const location = useLocation();
+
+  const matchIndex = !!useMatch(localePath("/", intl.locale));
 
   return (
     <div className="px-2 mx-auto max-w-2xl">
       <header className="sticky top-0 z-20 bg-background">
         <nav className="flex justify-between items-center w-full py-3 rounded">
-          {location.pathname !== $i18n("/", intl.locale) ? (
+          {!matchIndex ? (
             <Link
               className="flex items-center gap-2"
               to="/"

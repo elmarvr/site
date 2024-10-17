@@ -1,9 +1,9 @@
 import * as React from "react";
-import { useLocation, useNavigate } from "@remix-run/react";
 import { FormattedDisplayName, useIntl } from "react-intl";
 import { i18n } from "i18n.config";
 import { Select, SelectContentProps } from "./ui/select";
-import { $i18n } from "~/i18n/route";
+import { useChangeLocale } from "~/i18n/react";
+import { Locale } from "~/i18n/core";
 
 interface LocaleSelectProps extends Pick<SelectContentProps, "side" | "align"> {
   children: React.ReactNode;
@@ -15,14 +15,13 @@ const LocaleSelect = ({
   align = "end",
 }: LocaleSelectProps) => {
   const intl = useIntl();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const changeLocale = useChangeLocale();
 
   return (
     <Select
       value={intl.locale}
-      onValueChange={(locale) => {
-        navigate($i18n(location.pathname, locale));
+      onValueChange={(locale: Locale) => {
+        changeLocale(locale);
       }}
     >
       <Select.Trigger asChild>{children}</Select.Trigger>

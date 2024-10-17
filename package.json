@@ -11,9 +11,9 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "zod": "^3.23.8",
     "@formatjs/intl-localematcher": "^0.5.4",
     "@iconify-json/ph": "^1.2.0",
+    "@intlify/utils": "^0.13.0",
     "@radix-ui/react-collection": "^1.1.0",
     "@radix-ui/react-compose-refs": "^1.1.0",
     "@radix-ui/react-popover": "^1.1.1",
@@ -36,7 +36,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.6.8",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@content-collections/core": "^0.7.0",

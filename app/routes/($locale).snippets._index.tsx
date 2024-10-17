@@ -6,6 +6,7 @@ import { i18n } from "i18n.config";
 import { CollectionEntry, getCollection } from "~/lib/collection";
 import { ViewTransitionLink } from "~/components/view-transition-link";
 import { orderBy } from "~/lib/utils";
+import { detectLocale } from "~/i18n/server";
 
 export const meta = () => {
   return [
@@ -15,8 +16,8 @@ export const meta = () => {
   ];
 };
 
-export const loader = ({ params }: LoaderFunctionArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const locale = await detectLocale(request);
 
   const snippets = orderBy(
     getCollection("snippets", (entry) => entry._meta.directory === locale),

@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { createEnv } from "@t3-oss/env-core";
 
-console.log(import.meta.env);
-
 export const env = createEnv({
   server: {
     KV_REST_API_URL: z.string().url(),

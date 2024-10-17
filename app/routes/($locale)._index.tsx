@@ -1,19 +1,19 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { i18n } from "i18n.config";
 import React from "react";
 import { useIntl } from "react-intl";
 import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { ViewTransitionLink } from "~/components/view-transition-link";
+import { detectLocale } from "~/i18n/server";
 import { getCollection, getEntry } from "~/lib/collection";
 import { getPlaybackState } from "~/lib/spotify.server";
 import { orderBy } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const locale = params.locale ?? i18n.defaultLocale;
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const locale = await detectLocale(request);
 
   const introduction = getEntry("introduction", locale);
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { FormattedDate, FormattedMessage } from "react-intl";
 import { Fragment } from "react/jsx-runtime";
 import { PlaybackState } from "~/lib/spotify.server";
@@ -51,11 +52,21 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
         ) : (
           <>
             <FormattedMessage id="player.last-played-at" />{" "}
-            <FormattedDate
-              value={timestamp}
-              dateStyle="medium"
-              timeStyle="long"
-            />
+            <>
+              {/* Split these so we don't get a hydration mismatch */}
+              <FormattedDate
+                value={timestamp}
+                day="numeric"
+                month="short"
+              />,{" "}
+              <FormattedDate
+                value={timestamp}
+                // dateStyle="medium"
+                hour="numeric"
+                minute="numeric"
+                timeZoneName="short"
+              />
+            </>
           </>
         )}
       </div>
