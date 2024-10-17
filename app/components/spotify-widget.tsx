@@ -1,10 +1,5 @@
 import { Suspense } from "react";
-import {
-  FormattedDate,
-  FormattedMessage,
-  FormattedTime,
-  useIntl,
-} from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Fragment } from "react/jsx-runtime";
 import { PlaybackState } from "~/lib/spotify.server";
 import { cx, focusRing } from "~/lib/styles";
@@ -55,10 +50,13 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
             <FormattedMessage id="player.listening-now" />
           </>
         ) : (
-          <>
-            <FormattedMessage id="player.last-played-at" />
-            <PlayedAtDate timestamp={timestamp} />
-          </>
+          timestamp && (
+            <>
+              <FormattedMessage id="player.last-played-at" />
+              &nbsp;
+              <PlayedAtDate timestamp={timestamp} />
+            </>
+          )
         )}
       </div>
     </div>

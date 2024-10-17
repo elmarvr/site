@@ -11,11 +11,11 @@ export async function getPlaybackState() {
   const response = await spotify("me/player");
 
   if (response.status === 204) {
-    const { track, played_at } = await getLastPlayed();
+    const { track } = await getLastPlayed();
 
     return {
       track,
-      timestamp: new Date(played_at).getTime(),
+      timestamp: null,
       isPlaying: false,
     };
   }
@@ -29,30 +29,46 @@ export async function getPlaybackState() {
     })
     .parse(json);
 
-  return {
+  const playbackState = {
     track: item,
     timestamp,
     isPlaying: is_playing,
   };
+
+  return playbackState;
 }
 
 export type PlaybackState = Awaited<ReturnType<typeof getPlaybackState>>;
 
 async function getLastPlayed() {
-  const response = await spotify("me/player/recently-played");
+  const cached = await kv.get<{ track: z.infer<typeof trackSchema> }>(
+    "spotify:last_played"
+  );
+
+  if (cached) {
+    return cached;
+  }
+
+  const response = await spotify("me/player/recently-played?limit=1");
   const json = await response.json();
   const { items } = z
     .object({
       items: z.array(
         z.object({
           track: trackSchema,
-          played_at: z.string(),
         })
       ),
     })
     .parse(json);
 
-  return items[0];
+  const lastPlayed = items[0];
+
+  await kv.set("spotify:last_played", lastPlayed, {
+    // 1 hour
+    ex: 60 * 60,
+  });
+
+  return lastPlayed;
 }
 
 async function spotify(endpoint: string) {
