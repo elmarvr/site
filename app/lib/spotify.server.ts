@@ -11,11 +11,11 @@ export async function getPlaybackState() {
   const response = await spotify("me/player");
 
   if (response.status === 204) {
-    const { track } = await getLastPlayed();
+    const { track, played_at } = await getLastPlayed();
 
     return {
       track,
-      timestamp: null,
+      timestamp: new Date(played_at).getTime(),
       isPlaying: false,
     };
   }
@@ -41,9 +41,10 @@ export async function getPlaybackState() {
 export type PlaybackState = Awaited<ReturnType<typeof getPlaybackState>>;
 
 async function getLastPlayed() {
-  const cached = await kv.get<{ track: z.infer<typeof trackSchema> }>(
-    "spotify:last_played"
-  );
+  const cached = await kv.get<{
+    track: z.infer<typeof trackSchema>;
+    played_at: string;
+  }>("spotify:last_played");
 
   if (cached) {
     return cached;
@@ -56,6 +57,7 @@ async function getLastPlayed() {
       items: z.array(
         z.object({
           track: trackSchema,
+          played_at: z.string(),
         })
       ),
     })

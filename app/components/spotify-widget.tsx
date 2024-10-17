@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
 import { Fragment } from "react/jsx-runtime";
 import { PlaybackState } from "~/lib/spotify.server";
 import { cx, focusRing } from "~/lib/styles";
@@ -50,13 +50,11 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
             <FormattedMessage id="player.listening-now" />
           </>
         ) : (
-          timestamp && (
-            <>
-              <FormattedMessage id="player.last-played-at" />
-              &nbsp;
-              <PlayedAtDate timestamp={timestamp} />
-            </>
-          )
+          <>
+            <FormattedMessage id="player.last-played-at" />
+            &nbsp;
+            <PlayedAtDate timestamp={timestamp} />
+          </>
         )}
       </div>
     </div>
@@ -64,22 +62,20 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
 };
 
 export const PlayedAtDate = ({ timestamp }: { timestamp: number }) => {
-  const intl = useIntl();
-  const formattedDate = intl.formatDate(timestamp, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  });
-
   return (
     <Suspense>
       <time
         suppressHydrationWarning
         dateTime={new Date(timestamp).toISOString()}
       >
-        {formattedDate}
+        <FormattedDate
+          value={timestamp}
+          month="short"
+          day="numeric"
+          hour="numeric"
+          minute="numeric"
+          timeZoneName="short"
+        />
       </time>
     </Suspense>
   );

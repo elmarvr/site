@@ -1,26 +1,36 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { FormattedDate, FormattedPlural, useIntl } from "react-intl";
-import { i18n } from "i18n.config";
 
 import { CollectionEntry, getCollection } from "~/lib/collection";
 import { ViewTransitionLink } from "~/components/view-transition-link";
 import { orderBy } from "~/lib/utils";
-import { detectLocale } from "~/i18n/server";
+import { createServerIntl, detectLocale } from "~/i18n/server";
+import { generateSeoMeta } from "~/lib/seo.server";
 
-export const meta = () => {
+export const meta = ({ data }: MetaArgs<typeof loader>) => {
+  if (!data) return [];
+
   return [
     {
-      title: "Elmar | Snippets",
+      title: data.title,
     },
+    {
+      name: "description",
+      content: data.description,
+    },
+    ...data.seo.links,
   ];
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const locale = await detectLocale(request);
+  const intl = await createServerIntl(request);
+  const seo = await generateSeoMeta(request);
+  const title = intl.formatMessage({ id: "page.snippets.title" });
+  const description = intl.formatMessage({ id: "page.snippets.description" });
 
   const snippets = orderBy(
-    getCollection("snippets", (entry) => entry._meta.directory === locale),
+    getCollection("snippets", (entry) => entry._meta.directory === intl.locale),
     (snippet) => snippet.date,
     "desc"
   );
@@ -51,6 +61,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   return {
     snippets: grouped,
+    seo,
+    title,
+    description,
   };
 };
 

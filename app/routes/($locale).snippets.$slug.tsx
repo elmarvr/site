@@ -1,31 +1,45 @@
 import { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { i18n } from "i18n.config";
 import { FormattedMessage } from "react-intl";
 import { Icon } from "~/components/ui/icon";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { useViewTransitionState } from "~/hooks/use-view-transition";
-import { detectLocale } from "~/i18n/server";
+import { createServerIntl } from "~/i18n/server";
 import { getEntry } from "~/lib/collection";
+import { generateSeoMeta } from "~/lib/seo.server";
 import { attr } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
-export const meta = ({ params }: MetaArgs) => {
-  // const locale = await detectLocale(request);
-  // const snippet = getEntry("snippets", `${locale}/${params.slug}`);
+export const meta = ({ data }: MetaArgs<typeof loader>) => {
+  if (!data) return [];
 
   return [
     {
-      // title: `Elmar | ${snippet.title}`,
+      title: data.title,
     },
+    {
+      name: "description",
+      content: data.description,
+    },
+    ...data.seo.links,
   ];
 };
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const locale = await detectLocale(request);
+  const intl = await createServerIntl(request);
+  const seo = await generateSeoMeta(request);
 
-  const snippet = getEntry("snippets", `${locale}/${params.slug}`);
+  const snippet = getEntry("snippets", `${intl.locale}/${params.slug}`);
+
+  const title = intl.formatMessage(
+    { id: "page.snippet.title" },
+    { snippet: snippet.title }
+  );
+  const description = intl.formatMessage(
+    { id: "page.snippet.description" },
+    { snippet: snippet.title }
+  );
 
   if (!snippet) {
     throw new Response(null, {
@@ -36,6 +50,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return {
     snippet,
+    seo,
+    title,
+    description,
   };
 };
 

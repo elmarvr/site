@@ -10,13 +10,14 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useParams,
   useRouteError,
 } from "@remix-run/react";
 import { i18n } from "i18n.config";
 
 import "./index.css";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { I18nProvider } from "./i18n/react";
 import { localePath } from "./i18n/core";
 import { detectLocale } from "./i18n/server";
@@ -28,6 +29,21 @@ export const shouldRevalidate = ({
   if (currentParams.locale !== nextParams.locale) {
     return true;
   }
+};
+
+export const links = () => {
+  return [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    {
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossOrigin: "true",
+    },
+    {
+      href: "https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap",
+      rel: "stylesheet",
+    },
+  ];
 };
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {

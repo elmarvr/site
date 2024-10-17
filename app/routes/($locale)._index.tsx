@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React from "react";
 import { useIntl } from "react-intl";
@@ -6,31 +6,50 @@ import { SpotifyWidget } from "~/components/spotify-widget";
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
 import { ViewTransitionLink } from "~/components/view-transition-link";
-import { detectLocale } from "~/i18n/server";
+import { createServerIntl } from "~/i18n/server";
 import { getCollection, getEntry } from "~/lib/collection";
+import { generateSeoMeta } from "~/lib/seo.server";
 import { getPlaybackState } from "~/lib/spotify.server";
 import { orderBy } from "~/lib/utils";
 import { MDXContent } from "~/mdx/client";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const locale = await detectLocale(request);
+export const meta = ({ data }: MetaArgs<typeof loader>) => {
+  if (!data) return [];
 
-  const introduction = getEntry("introduction", locale);
+  return [
+    {
+      title: data.title,
+    },
+    {
+      name: "description",
+      content: data.description,
+    },
+    ...data.seo.links,
+  ];
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const intl = await createServerIntl(request);
+  const seo = await generateSeoMeta(request);
+  const title = intl.formatMessage({ id: "page.index.title" });
+  const description = intl.formatMessage({ id: "page.index.description" });
+
+  const introduction = getEntry("introduction", intl.locale);
 
   const snippets = orderBy(
-    getCollection("snippets", (entry) => entry._meta.directory === locale),
+    getCollection("snippets", (entry) => entry._meta.directory === intl.locale),
     (snippet) => snippet.date,
     "desc"
   );
 
   const projects = getCollection(
     "projects",
-    (entry) => entry._meta.directory === locale
+    (entry) => entry._meta.directory === intl.locale
   );
 
   const playbackState = await getPlaybackState();
 
-  const connect = getEntry("connect", locale);
+  const connect = getEntry("connect", intl.locale);
 
   return {
     introduction,
@@ -38,6 +57,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     recentProjects: projects.slice(0, 3),
     playbackState,
     connect,
+    seo,
+    title,
+    description,
   };
 };
 

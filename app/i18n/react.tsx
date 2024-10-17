@@ -11,7 +11,7 @@ import {
   RawIntlProvider,
   useIntl,
 } from "react-intl";
-import { createIntl, Locale, localePath, messages } from "./core";
+import { Locale, localePath, messages } from "./core";
 import { i18n } from "i18n.config";
 
 export const I18nProvider = ({

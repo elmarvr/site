@@ -1,33 +1,10 @@
-import { Link, Outlet, useLocation, useMatch } from "@remix-run/react";
+import { Link, Outlet, useMatch } from "@remix-run/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { LocaleSelect } from "~/components/locale-select";
 import { Button } from "~/components/ui/button";
 import { Icon } from "~/components/ui/icon";
 import { Tooltip } from "~/components/ui/tooltip";
 import { localePath } from "~/i18n/core";
-
-export const meta = () => {
-  return [
-    {
-      title: "Elmar",
-    },
-  ];
-};
-
-export const links = () => {
-  return [
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    {
-      rel: "preconnect",
-      href: "https://fonts.gstatic.com",
-      crossOrigin: "true",
-    },
-    {
-      href: "https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap",
-      rel: "stylesheet",
-    },
-  ];
-};
 
 export default function LocaleLayout() {
   const intl = useIntl();

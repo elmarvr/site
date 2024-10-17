@@ -3,31 +3,42 @@ import { useLoaderData } from "@remix-run/react";
 
 import { Link } from "~/components/ui/link";
 import { Prose } from "~/components/ui/prose";
-import { detectLocale } from "~/i18n/server";
+import { createServerIntl } from "~/i18n/server";
 import { getCollection } from "~/lib/collection";
+import { generateSeoMeta } from "~/lib/seo.server";
 import { MDXContent } from "~/mdx/client";
 
-export const meta = () => {
-  // const locale = await detectLocale(request);
+export const meta = ({ data }: MetaArgs<typeof loader>) => {
+  if (!data) return [];
 
   return [
     {
-      // Could pass the intl object from entry.server.ts but it's feels like a lot effort for a single title
-      // title: `Elmar | ${locale === "en" ? "Projects" : "Projecten"}`,
+      title: data.title,
     },
+    {
+      name: "description",
+      content: data.description,
+    },
+    ...data.seo.links,
   ];
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const locale = await detectLocale(request);
+  const intl = await createServerIntl(request);
+  const seo = await generateSeoMeta(request);
+  const title = intl.formatMessage({ id: "page.projects.title" });
+  const description = intl.formatMessage({ id: "page.projects.description" });
 
   const projects = getCollection(
     "projects",
-    (entry) => entry._meta.directory === locale
+    (entry) => entry._meta.directory === intl.locale
   );
 
   return {
     projects,
+    seo,
+    title,
+    description,
   };
 };
 

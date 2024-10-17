@@ -17,5 +17,16 @@
   "plural.other": "de",
 
   "player.listening-now": "Luistert nu",
-  "player.last-played-at": "Laatst afgespeeld op"
+  "player.last-played-at": "Laatst afgespeeld op",
+
+  "page.index.title": "Elmar",
+  "page.index.description": "Elmar's persoonlijke site",
+  "page.snippets.title": "Elmar | Snippets",
+  "page.snippets.description": "Elmar's code snippets",
+  "page.projects.title": "Elmar | Projecten",
+  "page.projects.description": "Elmar's projecten",
+  "page.project.title": "Elmar | {project}",
+  "page.project.description": "Elmar's project: {project}",
+  "page.snippet.title": "Elmar | {snippet}",
+  "page.snippet.description": "Elmar's snippet: {snippet}"
 }

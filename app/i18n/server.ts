@@ -1,8 +1,8 @@
 import { match } from "@formatjs/intl-localematcher";
-import { createCookie } from "@remix-run/node";
+import { createCookie, MetaFunction } from "@remix-run/node";
 import { i18n } from "i18n.config";
 import Negotiator from "negotiator";
-import { createIntl, Locale } from "./core";
+import { createIntl, Locale, localePath } from "./core";
 
 export async function createServerIntl(request: Request) {
   const locale = await detectLocale(request);

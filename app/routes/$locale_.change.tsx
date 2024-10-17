@@ -9,11 +9,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const headers = new Headers();
   headers.set("Set-Cookie", await localeCookie.serialize(locale));
 
-  console.log(
-    "redirectTo",
-    localePath(search.get("redirectTo") ?? "/", locale)
-  );
-
   return redirect(localePath(search.get("redirectTo") ?? "/", locale), {
     headers,
   });
