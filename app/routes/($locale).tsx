@@ -32,7 +32,13 @@ export default function LocaleLayout() {
             <Tooltip>
               <Tooltip.Trigger asChild>
                 <Button asChild>
-                  <Link to="/projects" unstable_viewTransition>
+                  <Link
+                    to="/projects"
+                    unstable_viewTransition
+                    aria-label={intl.formatMessage({
+                      id: "nav.projects",
+                    })}
+                  >
                     <Icon.Brackets />
                   </Link>
                 </Button>
@@ -45,7 +51,13 @@ export default function LocaleLayout() {
             <Tooltip>
               <Tooltip.Trigger asChild>
                 <Button asChild>
-                  <Link to="/snippets" unstable_viewTransition>
+                  <Link
+                    to="/snippets"
+                    unstable_viewTransition
+                    aria-label={intl.formatMessage({
+                      id: "nav.snippets",
+                    })}
+                  >
                     <Icon.Scissors />
                   </Link>
                 </Button>
@@ -58,7 +70,11 @@ export default function LocaleLayout() {
             <Tooltip>
               <LocaleSelect>
                 <Tooltip.Trigger asChild>
-                  <Button>
+                  <Button
+                    aria-label={intl.formatMessage({
+                      id: "nav.language",
+                    })}
+                  >
                     <Icon.Globe />
                   </Button>
                 </Tooltip.Trigger>
