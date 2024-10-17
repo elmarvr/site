@@ -76,8 +76,13 @@ export const PlayedAtDate = ({ timestamp }: { timestamp: number }) => {
   });
 
   return (
-    <time suppressHydrationWarning dateTime={new Date(timestamp).toISOString()}>
-      {formattedDate}
-    </time>
+    <Suspense>
+      <time
+        suppressHydrationWarning
+        dateTime={new Date(timestamp).toISOString()}
+      >
+        {formattedDate}
+      </time>
+    </Suspense>
   );
 };
