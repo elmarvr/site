@@ -10,16 +10,7 @@ import { PlaybackState } from "~/lib/spotify.server";
 import { cx, focusRing } from "~/lib/styles";
 
 export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
-  const intl = useIntl();
   const { track, isPlaying, timestamp } = state;
-
-  const formattedDate = intl.formatDate(timestamp, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  });
 
   return (
     <div className="p-2 bg-card/20 rounded">
@@ -65,10 +56,28 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
           </>
         ) : (
           <>
-            <FormattedMessage id="player.last-played-at" /> {formattedDate}
+            <FormattedMessage id="player.last-played-at" />
+            <PlayedAtDate timestamp={timestamp} />
           </>
         )}
       </div>
     </div>
+  );
+};
+
+export const PlayedAtDate = ({ timestamp }: { timestamp: number }) => {
+  const intl = useIntl();
+  const formattedDate = intl.formatDate(timestamp, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  });
+
+  return (
+    <time suppressHydrationWarning dateTime={new Date(timestamp).toISOString()}>
+      {formattedDate}
+    </time>
   );
 };
