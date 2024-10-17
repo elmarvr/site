@@ -1,11 +1,25 @@
 import { Suspense } from "react";
-import { FormattedDate, FormattedMessage } from "react-intl";
+import {
+  FormattedDate,
+  FormattedMessage,
+  FormattedTime,
+  useIntl,
+} from "react-intl";
 import { Fragment } from "react/jsx-runtime";
 import { PlaybackState } from "~/lib/spotify.server";
 import { cx, focusRing } from "~/lib/styles";
 
 export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
+  const intl = useIntl();
   const { track, isPlaying, timestamp } = state;
+
+  const formattedDate = intl.formatDate(timestamp, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  });
 
   return (
     <div className="p-2 bg-card/20 rounded">
@@ -51,22 +65,7 @@ export const SpotifyWidget = ({ state }: { state: PlaybackState }) => {
           </>
         ) : (
           <>
-            <FormattedMessage id="player.last-played-at" />{" "}
-            <>
-              {/* Split these so we don't get a hydration mismatch */}
-              <FormattedDate
-                value={timestamp}
-                day="numeric"
-                month="short"
-              />,{" "}
-              <FormattedDate
-                value={timestamp}
-                // dateStyle="medium"
-                hour="numeric"
-                minute="numeric"
-                timeZoneName="short"
-              />
-            </>
+            <FormattedMessage id="player.last-played-at" /> {formattedDate}
           </>
         )}
       </div>

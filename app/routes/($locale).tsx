@@ -95,7 +95,6 @@ export default function LocaleLayout() {
       </header>
 
       <main>
-        {intl.locale}
         <Outlet />
       </main>
     </div>
