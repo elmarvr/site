@@ -77,7 +77,7 @@ export default function Projects() {
               <MDXContent code={project.content} />
             </Prose>
 
-            <ul className="flex  flex-wrap gap-2">
+            <ul className="flex flex-wrap gap-2">
               {project.skills.map((skill) => {
                 return (
                   <li

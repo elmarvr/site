@@ -1,6 +1,4 @@
-import { useNavigate, useSearchParams } from "@remix-run/react";
 import * as React from "react";
-import { useViewTransitionState } from "~/hooks/use-view-transition";
 import { Tabs, TabsContentProps, TabsProps } from "./tabs";
 
 interface CodeGroupProps extends TabsProps {
